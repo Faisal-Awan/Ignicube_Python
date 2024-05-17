@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Can Build Line</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+	<div class="container">
+		<h1>Can Build Line</h1>
+		<form id="canBuildForm">
+			<label for="length">Length (in meters):</label>
+			<input type="number" id="length" name="length" required>
+
+			<label for="bricks_5m">Number of 5M bricks:</label>
+			<input type="number" id="bricks_5m" name="bricks_5m" required>
+
+			<label for="bricks_1m">Number of 1M bricks:</label>
+			<input type="number" id="bricks_1m" name="bricks_1m" required>
+
+			<button type="submit">Check</button>
+		</form>
+		<div id="result"></div>
+	</div>
+
+	<script>
+		document.getElementById('canBuildForm').addEventListener('submit', function (event) {
+			event.preventDefault();
+
+			const length = document.getElementById('length').value;
+			const bricks_5m = document.getElementById('bricks_5m').value;
+			const bricks_1m = document.getElementById('bricks_1m').value;
+
+			fetch('/can_build', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					length: parseInt(length),
+					bricks_5m: parseInt(bricks_5m),
+					bricks_1m: parseInt(bricks_1m)
+				})
+			})
+				.then(response => response.json())
+				.then(data => {
+					const resultDiv = document.getElementById('result');
+					if (data.can_build) {
+						resultDiv.innerHTML = '<p class="success">You can build the line! True </p>';
+					} else {
+						resultDiv.innerHTML = '<p class="error">You cannot build the line! False</p>';
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					document.getElementById('result').innerHTML = '<p class="error">There was an error processing your request.</p>';
+				});
+		});
+	</script>
+</body>
+
+</html>
